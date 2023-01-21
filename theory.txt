@@ -1,0 +1,7 @@
+To create a new virtual Environment 
+
+py -3 -m venv venv
+
+To activate the new virtual environment
+
+Go to More -> Python ->
