@@ -13,15 +13,19 @@ class Post(BaseModel):
     rating:Optional[float]=None
 
 
-## Saving your data/ Database is not included now
-## On refreshing the data get changed. So its not stored permenantly
-
 # Function for finding the post with particular id
 def find_post(id):
     for i in posts:
         if i['id']==id:
             return i
 
+def find_post_index(id,i):
+    for post in posts:
+        i=i+1
+        if post['id']==id:
+            return (post,i)
+    
+    return (None,-1)
 ## To make get request to the server. To get the data
 @app.get("/posts") 
 def root():
@@ -55,3 +59,16 @@ def get_post(id:int):
                         detail=f"The post with id : {id} is not found")
     
     return {"message":post}
+
+@app.delete("/delete/{id}")
+def delete_post(id:int):
+    i=-1
+    deletepost,index=find_post_index(id,i)
+    if index==-1:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                        detail=f"The post with id : {id} is not found")
+    
+    posts.pop(index)
+    return {"Message":"Post Deleted Successfully",
+            "Post":posts}
+

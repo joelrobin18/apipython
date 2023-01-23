@@ -1,3 +1,6 @@
+## Saving your data/ Database is not included now
+## On refreshing the data get changed. So its not stored permenantly
+
 posts=[ {
             "title": "Test Post 1",
             "caption": "Test Caption 1",
