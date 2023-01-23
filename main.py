@@ -49,6 +49,7 @@ def latest():
     latest_posts.append(posts[len(posts)-2])
     return {"Latest Post":latest_posts}
 
+
 # Getting a particular post 
 @app.get("/posts/{id}")
 def get_post(id:int):
@@ -60,7 +61,16 @@ def get_post(id:int):
     
     return {"message":post}
 
-@app.delete("/delete/{id}")
+#Delete all the post
+@app.delete("/posts/delete/all")
+def delete_all_post():
+    posts.clear()
+    return {"Message":"Post Deleted Successfully",
+            "Posts":posts}
+
+
+#Delete a post with particular id
+@app.delete("/posts/delete/{id}")
 def delete_post(id:int):
     i=-1
     deletepost,index=find_post_index(id,i)
@@ -71,4 +81,6 @@ def delete_post(id:int):
     posts.pop(index)
     return {"Message":"Post Deleted Successfully",
             "Post":posts}
+    
+    
 
