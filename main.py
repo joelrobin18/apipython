@@ -11,6 +11,9 @@ class Post(BaseModel):
     author:str
     rating:Optional[float]=None
 
+## Saving your data/ Database is not included now
+posts=[]
+
 ## To make get request to the server. To get the data
 @app.get("/posts") 
 def root():
@@ -20,4 +23,5 @@ def root():
 def create(post:Post):
     post=post.dict()
     post['id']=randrange(0,10000)
-    return {"message":post}
+    posts.append(post)
+    return {"message":posts}
