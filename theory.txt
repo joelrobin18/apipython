@@ -18,3 +18,5 @@ def root() is the function which have all the necessary statement which is to be
 Schema Validation is using pydantic basemodel. Create a class with all the necesary thing that post required is needed
 If some of the content is optional use Optional[variable type] from typing package
 
+HTTPException :- Used for raising HTTP Exception like 404 error or 201 error or error like that
+status= To change the status code of each process
