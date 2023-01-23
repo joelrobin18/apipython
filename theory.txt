@@ -1,7 +1,20 @@
 To create a new virtual Environment 
-
 py -3 -m venv venv
 
+pip install fastapi[all]
+pip freeze :- To see all the dependencies installed in the venv
 To activate the new virtual environment
+Go to More -> Python -> Choose your environment
+or 
+venv\Scripts\Activate.ps1
 
-Go to More -> Python ->
+To run the server:
+uvicorn main:app --reload
+
+get is the Method which we use(Different kinds of methods are there such as get,post,delete,etc)
+("/") this is the path which describes the root
+def root() is the function which have all the necessary statement which is to be executed
+
+Schema Validation is using pydantic basemodel. Create a class with all the necesary thing that post required is needed
+If some of the content is optional use Optional[variable type] from typing package
+
