@@ -42,6 +42,8 @@ def find_post_index(id,i):
             return (post,i)
     
     return (None,-1)
+
+
 ## To make get request to the server. To get the data
 @app.get("/posts") 
 def root():
@@ -70,9 +72,11 @@ def create(Post:Post):
 # Get the latest Post
 @app.get("/posts/latest")
 def latest():
-    latest_posts=[]
-    latest_posts.append(posts[len(posts)-1])
-    latest_posts.append(posts[len(posts)-2])
+    # latest_posts=[]
+    # latest_posts.append(posts[len(posts)-1])
+    # latest_posts.append(posts[len(posts)-2])
+    cursor.execute("""SELECT * from post ORDER BY time desc LIMIT 3 """)
+    latest_posts=cursor.fetchall()
     return {"Latest Post":latest_posts}
 
 
@@ -90,7 +94,8 @@ def get_post(id:int):
 #Delete all the post
 @app.delete("/posts/delete/all",status_code=status.HTTP_204_NO_CONTENT)
 def delete_all_post():
-    posts.clear()
+    # posts.clear()
+    cursor.execute("""DELETE from post""")
     return Response(status_code=status.HTTP_204_NO_CONTENT) # While deleting a content we dont need to return any response. So we return no content as response
 
 
@@ -103,8 +108,9 @@ def delete_post(id:int):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                         detail=f"The post with id : {id} is not found")
     
-    posts.pop(index)
+    cursor.execute("""DELETE from post where id={id}""")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
 
 ## Updating a post as completely
 @app.put("/posts/{id}")
