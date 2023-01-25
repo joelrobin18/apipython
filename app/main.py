@@ -83,8 +83,10 @@ def latest():
 # Getting a particular post 
 @app.get("/posts/{id}")
 def get_post(id:int):
-    post= find_post(id)
-
+    # post= find_post(id) 
+    cursor.execute("""SELECT * from post where id = %s""",(str(id),))
+    post=cursor.fetchone()
+    
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                         detail=f"The post with id : {id} is not found")
@@ -95,20 +97,28 @@ def get_post(id:int):
 @app.delete("/posts/delete/all",status_code=status.HTTP_204_NO_CONTENT)
 def delete_all_post():
     # posts.clear()
-    cursor.execute("""DELETE from post""")
+    cursor.execute("""DELETE from post returning *""")
+    conn.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT) # While deleting a content we dont need to return any response. So we return no content as response
 
 
 #Delete a post with particular id
 @app.delete("/posts/delete/{id}",status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id:int):
-    i=-1
-    deletepost,index=find_post_index(id,i)
-    if index==-1:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
-                        detail=f"The post with id : {id} is not found")
+    # i=-1
+    # deletepost,index=find_post_index(id,i)
+    # if index==-1:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+    #                     detail=f"The post with id : {id} is not found")
     
-    cursor.execute("""DELETE from post where id={id}""")
+    cursor.execute("""DELETE from post where id=%s RETURNING *""",(str(id),))
+    deleted_post=cursor.fetchone()
+    
+    if not deleted_post:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Post with the id: {id} is not found")
+    
+    conn.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
