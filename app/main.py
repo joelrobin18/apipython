@@ -3,22 +3,22 @@ from pydantic import BaseModel
 from typing import Optional
 from random import randrange
 from app.data import *
-import psycopg2
+import psycopg2 as db
 import time ## Timer for sleep for or wait for certain amount of time
 app=FastAPI()
 
 
-try:
-    conn=psycopg2.connect(host="blaaaa",
-                            database="blaaaaa", 
-                            user="blaaaa",
-                            password="1234567890")
+# try:
+#     conn=db.connect(host="blaaaa",
+#                             database="blaaaaa", 
+#                             user="blaaaa",
+#                             password="1234567890")
     
-    cursor=conn.cursor()
-    print("Database Successfully Connected")
-except Exception as error:
-    print("Error",error)
-    pass
+#     cursor=conn.cursor()
+#     print("Database Successfully Connected")
+# except Exception as error:
+#     print("Error",error)
+#     pass
 
 ## Schema Validation
 class Post(BaseModel):
@@ -52,11 +52,19 @@ def root():
 
 # Creating a new post
 @app.post("/posts",status_code=status.HTTP_201_CREATED) ## Status Code Changed for creating a new post
-def create(post:Post):
-    post=post.dict()
-    post['id']=randrange(0,10000)
-    posts.append(post)
-    return {"All Post":posts}
+def create(Post:Post):
+    # post=post.dict()
+    # post['id']=randrange(0,10000)
+    # posts.append(post)
+    cursor.execute("""INSERT INTO post (title,caption,author,rating) VALUES (%s,%s,%s,%s) RETURNING *""",(Post.title,Post.caption,Post.author,Post.rating))
+    posts=cursor.fetchone()
+    conn.commit()
+    
+    cursor.execute("""SELECT * from post""")
+    all_posts=cursor.fetchall()
+    
+    return {"New Post":posts,
+            "All Post":all_posts}
 
 
 # Get the latest Post
