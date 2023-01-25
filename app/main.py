@@ -8,6 +8,7 @@ import time ## Timer for sleep for or wait for certain amount of time
 app=FastAPI()
 
 
+
 # try:
 #     conn=db.connect(host="blaaaa",
 #                             database="blaaaaa", 
@@ -128,12 +129,18 @@ def update(id:int,post:Post):
     i=-1
     post_value,index=find_post_index(id,i)
     
-    if index==-1:
+    
+    ## Using database
+    cursor.execute("""UPDATE post set title=%s ,caption=%s ,author=%s  where id = %s  RETURNING *""",(post.title,post.caption,post.author,str(id)))
+    updated_post=cursor.fetchone()
+    conn.commit()
+    
+    if  updated_post== None:
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"Post with id {id} not found")
+
+    # updated_post=post.dict() # Convert the class into dict
+    # updated_post['id']=id # Store the data with the same id
+    # posts[index]=updated_post # Store the same data into the same index
     
-    updated_post=post.dict() # Convert the class into dict
-    updated_post['id']=id # Store the data with the same id
-    posts[index]=updated_post # Store the same data into the same index
-    
-    return {"message":posts}
+    return {"Post Updated":updated_post}
