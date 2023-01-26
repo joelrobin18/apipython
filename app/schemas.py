@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,EmailStr
 from typing import Optional
+from datetime import datetime
 ## Schema Validation
 class Post(BaseModel):
     title:str
@@ -17,6 +18,29 @@ class Update(Post):
 
 class ResponsePost(Update):
     likes:int
-    
+    created_at:datetime
     class Config:
         orm_mode=True
+
+
+class User(BaseModel):
+    email:EmailStr
+    password:str
+    username:str
+    firstname:str
+    lastname:str
+
+class UserResponse(BaseModel):
+    email:EmailStr
+    username:str
+    firstname:str
+    lastname:str
+    
+    class Config:
+        orm_mode=True        
+
+class UserUpdate(BaseModel):
+    email:EmailStr
+    username:str
+    firstname:str
+    lastname:str
