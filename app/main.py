@@ -1,37 +1,14 @@
 from fastapi import FastAPI,Body,HTTPException,Response,status,Depends
-from pydantic import BaseModel
-from typing import Optional
 from random import randrange
 import psycopg2 as dbs
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
-from . import models
+from . import models,schemas
 from .database import engine,get_db
 import time ## Timer for sleep for or wait for certain amount of time
 app=FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
-
-# try:
-#     conn=db.connect(host="blaaaa",
-#                             database="blaaaaa", 
-#                             user="blaaaa",
-#                             password="1234567890")
-    
-#     cursor=conn.cursor()
-#     print("Database Successfully Connected")
-# except Exception as error:
-#     print("Error",error)
-#     pass
-
-## Schema Validation
-class Post(BaseModel):
-    title:str
-    caption:str
-    author:str
-    published:bool = False
-    rating:Optional[float]=None
-    likes:Optional[int] = None
-
 
 ## To make get request to the server. To get the data
 @app.get("/posts") 
@@ -43,12 +20,12 @@ def root(db:Session=Depends(get_db)):
     
     # Using SQLALCHEMY or ORM
     posts =db.query(models.Posts).all()
-    return {"Post":posts}
+    return posts
 
 
 # Creating a new post
 @app.post("/posts",status_code=status.HTTP_201_CREATED) ## Status Code Changed for creating a new post
-def create(post:Post,db:Session=Depends(get_db)):
+def create(post:schemas.PostCreate,db:Session=Depends(get_db)):
     
     # Using pure python without database
     # post=post.dict()
@@ -87,8 +64,9 @@ def latest(db:Session=Depends(get_db)):
     # latest_posts=cursor.fetchall()
     
     # Using SQLALCHEMY or ORM
-    latest_posts=db.query(models.Posts).all()
-    return {"Latest Post":latest_posts}
+    latest_posts=db.query(models.Posts).order_by(desc(models.Posts.created_at)).limit(2).all()
+    # print(latest_posts)
+    return latest_posts
 
 
 # Getting a particular post 
@@ -104,7 +82,7 @@ def get_post(id:int,db:Session=Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                         detail=f"The post with id : {id} is not found")
     
-    return {"message":post}
+    return post
 
 #Delete all the post
 @app.delete("/posts/delete/all",status_code=status.HTTP_204_NO_CONTENT)
@@ -136,14 +114,14 @@ def delete_post(id:int,db:Session=Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Post with the id: {id} is not found")
     
-    db.delete(deleted_post,synchronize_session=False)
+    db.delete(deleted_post)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 ## Updating a post as completely
 @app.put("/posts/{id}")
-def update(id:int,post:Post,db:Session=Depends(get_db)):
+def update(id:int,post:schemas.PostCreate,db:Session=Depends(get_db)):
     # i=-1
     # post_value,index=find_post_index(id,i)
     
@@ -166,5 +144,5 @@ def update(id:int,post:Post,db:Session=Depends(get_db)):
     updated_post.update(post.dict())
     db.commit()
     
-    return {"Post Updated":updated_post.first()}
+    return updated_post.first()
 
