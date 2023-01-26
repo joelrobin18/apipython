@@ -1,11 +1,24 @@
-from fastapi import FastAPI,Body,HTTPException,Response,status
+from fastapi import FastAPI,Body,HTTPException,Response,status,Depends
 from pydantic import BaseModel
 from typing import Optional
 from random import randrange
 from app.data import *
 import psycopg2 as db
+from sqlalchemy.orm import Session
+from . import models
+from .database import SessionLocal, engine
 import time ## Timer for sleep for or wait for certain amount of time
 app=FastAPI()
+
+models.Base.metadata.create_all(bind=engine)
+
+# Depedency. To get or give a request to a database
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 
