@@ -11,4 +11,12 @@ class Post(BaseModel):
 class PostCreate(Post):
     pass
 
+class Update(Post):
+    published:bool
+    rating:float
 
+class ResponsePost(Update):
+    likes:int
+    
+    class Config:
+        orm_mode=True

@@ -1,5 +1,6 @@
 from fastapi import FastAPI,Body,HTTPException,Response,status,Depends
 from random import randrange
+from typing import List
 import psycopg2 as dbs
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
@@ -11,7 +12,7 @@ app=FastAPI()
 models.Base.metadata.create_all(bind=engine)
 
 ## To make get request to the server. To get the data
-@app.get("/posts") 
+@app.get("/posts",response_model=List[schemas.ResponsePost]) 
 def root(db:Session=Depends(get_db)):
     
     # Using Raw SQL
@@ -24,7 +25,7 @@ def root(db:Session=Depends(get_db)):
 
 
 # Creating a new post
-@app.post("/posts",status_code=status.HTTP_201_CREATED) ## Status Code Changed for creating a new post
+@app.post("/posts",status_code=status.HTTP_201_CREATED, response_model=schemas.ResponsePost) ## Status Code Changed for creating a new post
 def create(post:schemas.PostCreate,db:Session=Depends(get_db)):
     
     # Using pure python without database
@@ -45,13 +46,11 @@ def create(post:schemas.PostCreate,db:Session=Depends(get_db)):
     db.commit()
     db.refresh(new_post)
     
-    all_posts=db.query(models.Posts).all()
-    return {"New Post":new_post,
-            "All Post":all_posts}
+    return new_post
 
 
 # Get the latest Post
-@app.get("/posts/latest")
+@app.get("/posts/latest",response_model=List[schemas.ResponsePost])
 def latest(db:Session=Depends(get_db)):
     
     # Using pure python without db
@@ -70,7 +69,7 @@ def latest(db:Session=Depends(get_db)):
 
 
 # Getting a particular post 
-@app.get("/posts/{id}")
+@app.get("/posts/{id}",response_model=schemas.ResponsePost)
 def get_post(id:int,db:Session=Depends(get_db)):
     # post= find_post(id) 
     # cursor.execute("""SELECT * from post where id = %s""",(str(id),))
@@ -120,8 +119,8 @@ def delete_post(id:int,db:Session=Depends(get_db)):
 
 
 ## Updating a post as completely
-@app.put("/posts/{id}")
-def update(id:int,post:schemas.PostCreate,db:Session=Depends(get_db)):
+@app.put("/posts/{id}",response_model=schemas.ResponsePost)
+def update(id:int,post:schemas.Update,db:Session=Depends(get_db)):
     # i=-1
     # post_value,index=find_post_index(id,i)
     
