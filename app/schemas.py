@@ -48,3 +48,6 @@ class UserUpdate(BaseModel):
 class UserCredentials(BaseModel):
     email:EmailStr
     password:str
+
+class TokenData(BaseModel):
+    id:Optional[int]= None

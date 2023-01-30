@@ -1,6 +1,6 @@
 from fastapi import FastAPI,Body,HTTPException,Response,status,Depends,APIRouter
 from ..database import engine,get_db
-from .. import models,schemas
+from .. import models,schemas,utils
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from random import randrange
@@ -26,7 +26,7 @@ def root(db:Session=Depends(get_db)):
 
 # Creating a new post
 @router.post("/",status_code=status.HTTP_201_CREATED, response_model=schemas.ResponsePost) ## Status Code Changed for creating a new post
-def create(post:schemas.PostCreate,db:Session=Depends(get_db)):
+def create(post:schemas.PostCreate,db:Session=Depends(get_db),user:int = Depends(utils.get_current_user)):
     
     # Using pure python without database
     # post=post.dict()
@@ -70,7 +70,7 @@ def latest(db:Session=Depends(get_db)):
 
 # Getting a particular post 
 @router.get("/{id}",response_model=schemas.ResponsePost)
-def get_post(id:int,db:Session=Depends(get_db)):
+def get_post(id:int,db:Session=Depends(get_db),user: int = Depends(utils.get_current_user)):
     # post= find_post(id) 
     # cursor.execute("""SELECT * from post where id = %s""",(str(id),))
     # post=cursor.fetchone()
@@ -85,7 +85,7 @@ def get_post(id:int,db:Session=Depends(get_db)):
 
 #Delete all the post
 @router.delete("/delete/all",status_code=status.HTTP_204_NO_CONTENT)
-def delete_all_post(db:Session=Depends(get_db)):
+def delete_all_post(db:Session=Depends(get_db),curr_user:id = Depends(utils.get_current_user)):
     # posts.clear()
     # cursor.execute("""DELETE from post returning *""")
     # conn.commit()
@@ -98,7 +98,7 @@ def delete_all_post(db:Session=Depends(get_db)):
 
 #Delete a post with particular id
 @router.delete("/delete/{id}",status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id:int,db:Session=Depends(get_db)):
+def delete_post(id:int,db:Session=Depends(get_db),curr_user:id = Depends(utils.get_current_user)):
     # i=-1
     # deletepost,index=find_post_index(id,i)
     # if index==-1:
@@ -120,7 +120,7 @@ def delete_post(id:int,db:Session=Depends(get_db)):
 
 ## Updating a post as completely
 @router.put("/{id}",response_model=schemas.ResponsePost)
-def update(id:int,post:schemas.Update,db:Session=Depends(get_db)):
+def update(id:int,post:schemas.Update,db:Session=Depends(get_db),curr_user:id = Depends(utils.get_current_user)):
     # i=-1
     # post_value,index=find_post_index(id,i)
     

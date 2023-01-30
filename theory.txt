@@ -24,3 +24,31 @@ status= To change the status code of each process
 Models contain all our tables
 SChemas contain all our data that needs to be validated or the data which the user needs to send.
 There are several of libraries that w need to import. So carefully study about all of them.
+
+
+JWT Concepts
+When the user logs in a token named as JWT token is created and saved in the local machine. This token 
+used to verify whether the user is logged in or not.
+
+This jwt token is created using a function called create_access_token:
+
+`
+SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+def create_access_token(data:dict):
+    encode=data.copy()
+    
+    expire=datetime.now()+timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    encode.update({"exp":expire})
+    JWT_TOKEN=jwt.encode(encode,SECRET_KEY,algorithm=ALGORITHM)
+    
+    return JWT_TOKEN
+`
+
+This has a secret code,algorithm and expire time. Secret code is used make the jwt token which should be
+secured and shouldnot be shared with anyone.
+
+For verification purposes, a verify_jwt code is called which decode JWT token and makes sure whether the user is
+logged in or not. This function can return either id or what all values we needed to make the jwt token.
