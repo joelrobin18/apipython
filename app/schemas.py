@@ -44,3 +44,7 @@ class UserUpdate(BaseModel):
     username:str
     firstname:str
     lastname:str
+
+class UserCredentials(BaseModel):
+    email:EmailStr
+    password:str

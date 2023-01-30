@@ -20,3 +20,7 @@ If some of the content is optional use Optional[variable type] from typing packa
 
 HTTPException :- Used for raising HTTP Exception like 404 error or 201 error or error like that
 status= To change the status code of each process
+
+Models contain all our tables
+SChemas contain all our data that needs to be validated or the data which the user needs to send.
+There are several of libraries that w need to import. So carefully study about all of them.
