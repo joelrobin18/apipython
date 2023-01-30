@@ -21,5 +21,13 @@ def login(user_cred:schemas.UserCredentials,db:Session=Depends(database.get_db))
     if not verified:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Invalid Credentials")
-
-    return {"message":"Authentication Successfull"}
+    
+    data = {
+        "user_id":user.id
+    }
+    
+    jwt_token = utils.create_access_token(data)
+    
+    return {"message":"Authentication Successfull",
+            "JWT Token": jwt_token,
+            "Token Type":"bearer"}
