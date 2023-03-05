@@ -12,8 +12,8 @@ router=APIRouter(
 )
 
 ## To make get request to the server. To get the data
-@router.get("/",response_model=List[schemas.ResponsePost]) 
-def root(db:Session=Depends(get_db)):
+@router.get("/",response_model=List[schemas.ResponsePost])  ## To Validate the response model
+def root(db:Session=Depends(get_db),curr_user:int = Depends(utils.get_current_user)):
     
     # Using Raw SQL
     # cursor.execute("""select * from post """)
@@ -21,6 +21,9 @@ def root(db:Session=Depends(get_db)):
     
     # Using SQLALCHEMY or ORM
     posts =db.query(models.Posts).all()
+    ## If you want to show only the post which an certain user you can use the follows
+    
+    post=db.query(models.Posts).filter(models.Posts.user_id==curr_user.id).all()
     return posts
 
 
@@ -41,7 +44,7 @@ def create(post:schemas.PostCreate,db:Session=Depends(get_db),user:int = Depends
     # all_posts=cursor.fetchall()
     
     # Using SQLALCHEMY or ORM
-    new_post=models.Posts(**post.dict())
+    new_post=models.Posts(user_id=user.id,**post.dict())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
@@ -91,6 +94,7 @@ def delete_all_post(db:Session=Depends(get_db),curr_user:id = Depends(utils.get_
     # conn.commit()
     
     # Delete all post using ORM
+    
     db.query(models.Posts).delete()
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT) # While deleting a content we dont need to return any response. So we return no content as response
@@ -109,9 +113,13 @@ def delete_post(id:int,db:Session=Depends(get_db),curr_user:id = Depends(utils.g
     # deleted_post=cursor.fetchone()
     
     deleted_post=db.query(models.Posts).filter(models.Posts.id==id).first()
+    
     if not deleted_post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Post with the id: {id} is not found")
+    
+    if deleted_post.user_id !=curr_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     
     db.delete(deleted_post)
     db.commit()
@@ -136,9 +144,13 @@ def update(id:int,post:schemas.Update,db:Session=Depends(get_db),curr_user:id = 
     
     # Using ORM and python
     updated_post=db.query(models.Posts).filter(models.Posts.id==id)
-    if  updated_post== None:
+    
+    if not updated_post:
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"Post with id {id} not found")
+    
+    if updated_post.first().user_id!=curr_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     
     updated_post.update(post.dict())
     db.commit()

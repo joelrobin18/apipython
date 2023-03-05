@@ -1,7 +1,8 @@
 from sqlalchemy import *
 from .database import Base
+# Model contain all our table which we needed in our backend app
 class Posts(Base):
-    __tablename__ = "posts"
+    __tablename__ = "post"
     
     id=Column(Integer ,nullable=False, primary_key=True)
     title=Column(String,nullable=False)
@@ -10,7 +11,8 @@ class Posts(Base):
     likes=Column(Integer, nullable=False,server_default='0')
     created_at=Column(TIMESTAMP(timezone=true),nullable=False,server_default=text('NOW()'))
     published=Column(Boolean, server_default='False',nullable=False)
-    rating=Column(Float)    
+    rating=Column(Float)
+    user_id=Column(Integer,ForeignKey("users.id",ondelete="CASCADE"),nullable=False)    
 
 
 class User(Base):

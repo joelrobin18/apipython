@@ -62,7 +62,7 @@ def delete_a_user(id:int,db:Session=Depends(get_db)):
 
 
 @router.put("/update/{id}",response_model=schemas.UserResponse)
-def update_user(id:int,update:schemas.UserUpdate,db:Session=Depends(get_db)):
+def update_user(id:int,update:schemas.UserUpdate,db:Session=Depends(get_db),user:id=Depends(utils.get_current_user)):
     
     update_user=db.query(models.User).filter(models.User.id==id)
     if update_user == None:

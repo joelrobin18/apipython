@@ -32,5 +32,5 @@ def login(user_cred:OAuth2PasswordRequestForm = Depends(),db:Session=Depends(dat
     jwt_token = utils.create_access_token(data)
     
     return {"message":"Authentication Successfull",
-            "JWT Token": jwt_token,
+            "JWT_Token": jwt_token,
             "Token Type":"bearer"}

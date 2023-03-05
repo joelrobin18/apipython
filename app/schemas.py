@@ -19,6 +19,7 @@ class Update(Post):
 class ResponsePost(Update):
     likes:int
     created_at:datetime
+    user_id:int
     class Config:
         orm_mode=True
 
