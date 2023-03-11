@@ -23,7 +23,7 @@ def root(db:Session=Depends(get_db),curr_user:int = Depends(utils.get_current_us
     posts =db.query(models.Posts).all()
     ## If you want to show only the post which an certain user you can use the follows
     
-    post=db.query(models.Posts).filter(models.Posts.user_id==curr_user.id).all()
+    # post=db.query(models.Posts).filter(models.Posts.user_id==curr_user.id).all()
     return posts
 
 
@@ -54,7 +54,7 @@ def create(post:schemas.PostCreate,db:Session=Depends(get_db),user:int = Depends
 
 # Get the latest Post
 @router.get("/latest",response_model=List[schemas.ResponsePost])
-def latest(db:Session=Depends(get_db)):
+def latest(db:Session=Depends(get_db),curr_user:int = Depends(utils.get_current_user)):
     
     # Using pure python without db
     # latest_posts=[]

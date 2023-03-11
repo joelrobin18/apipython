@@ -1,4 +1,5 @@
 from sqlalchemy import *
+from sqlalchemy.orm import relationship
 from .database import Base
 # Model contain all our table which we needed in our backend app
 class Posts(Base):
@@ -12,7 +13,8 @@ class Posts(Base):
     created_at=Column(TIMESTAMP(timezone=true),nullable=False,server_default=text('NOW()'))
     published=Column(Boolean, server_default='False',nullable=False)
     rating=Column(Float)
-    user_id=Column(Integer,ForeignKey("users.id",ondelete="CASCADE"),nullable=False)    
+    user_id=Column(Integer,ForeignKey("users.id",ondelete="CASCADE"),nullable=False)
+    user = relationship("User")   # Update the responce model
 
 
 class User(Base):

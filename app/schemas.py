@@ -15,22 +15,7 @@ class PostCreate(Post):
 class Update(Post):
     published:bool
     rating:float
-
-class ResponsePost(Update):
-    likes:int
-    created_at:datetime
-    user_id:int
-    class Config:
-        orm_mode=True
-
-
-class User(BaseModel):
-    email:EmailStr
-    password:str
-    username:str
-    firstname:str
-    lastname:str
-
+    
 class UserResponse(BaseModel):
     email:EmailStr
     username:str
@@ -39,6 +24,22 @@ class UserResponse(BaseModel):
     
     class Config:
         orm_mode=True        
+
+class ResponsePost(Update):
+    likes:int
+    created_at:datetime
+    user_id:int
+    user:UserResponse
+    class Config:
+        orm_mode=True
+
+class User(BaseModel):
+    email:EmailStr
+    password:str
+    username:str
+    firstname:str
+    lastname:str
+
 
 class UserUpdate(BaseModel):
     email:EmailStr
