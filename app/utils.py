@@ -4,7 +4,6 @@ from jose import JWTError,jwt
 from datetime import datetime,timedelta
 from . import schemas
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy.orm import Session
 pwd_content = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth=OAuth2PasswordBearer(tokenUrl="login")

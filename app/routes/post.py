@@ -13,14 +13,14 @@ router=APIRouter(
 
 ## To make get request to the server. To get the data
 @router.get("/",response_model=List[schemas.ResponsePost])  ## To Validate the response model
-def root(db:Session=Depends(get_db),curr_user:int = Depends(utils.get_current_user)):
+def root(db:Session=Depends(get_db),curr_user:int = Depends(utils.get_current_user),limit:int=10,search:str="",skip:int =0):
     
     # Using Raw SQL
     # cursor.execute("""select * from post """)
     # posts = cursor.fetchall()
     
     # Using SQLALCHEMY or ORM
-    posts =db.query(models.Posts).all()
+    posts =db.query(models.Posts).filter(models.Posts.title.contains(search)).limit(limit).offset(skip).all()
     ## If you want to show only the post which an certain user you can use the follows
     
     # post=db.query(models.Posts).filter(models.Posts.user_id==curr_user.id).all()
