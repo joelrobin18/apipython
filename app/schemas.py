@@ -3,6 +3,7 @@ from typing import Optional
 from datetime import datetime
 ## Schema Validation
 class Post(BaseModel):
+    id:int
     title:str
     caption:str
     author:str
@@ -17,6 +18,7 @@ class Update(Post):
     rating:float
     
 class UserResponse(BaseModel):
+    id:str
     email:EmailStr
     username:str
     firstname:str

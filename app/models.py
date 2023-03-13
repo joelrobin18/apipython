@@ -27,3 +27,9 @@ class User(Base):
     created_at=Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('NOW()'))
     firstname=Column(String,nullable=False)
     lastname=Column(String,nullable=False)
+    
+class Votes(Base):
+
+    __tablename__ = "votes"
+    user_id=Column(Integer,ForeignKey("users.id",ondelete="CASCADE"),primary_key=True)
+    post_id = Column(Integer, ForeignKey("post.id",ondelete="CASCADE"),primary_key=True)
