@@ -1,6 +1,7 @@
 from pydantic import BaseModel,EmailStr
 from typing import Optional
 from datetime import datetime
+from pydantic.types import conint
 ## Schema Validation
 class Post(BaseModel):
     id:int
@@ -55,3 +56,7 @@ class UserCredentials(BaseModel):
 
 class TokenData(BaseModel):
     id:Optional[int]= None
+
+class Votes(BaseModel):
+    post_id:int
+    dir:conint(le=1)    
