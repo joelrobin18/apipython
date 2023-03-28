@@ -11,8 +11,12 @@ class Post(BaseModel):
     published:bool = False
     rating:Optional[float]=None
 
-class PostCreate(Post):
-    pass
+class PostCreate(BaseModel):
+    title:str
+    caption:str
+    author:str
+    published:bool = False
+    rating:Optional[float]=None
 
 class Update(Post):
     published:bool
@@ -29,7 +33,6 @@ class UserResponse(BaseModel):
         orm_mode=True        
 
 class ResponsePost(Update):
-    likes:int
     created_at:datetime
     user_id:int
     user:UserResponse

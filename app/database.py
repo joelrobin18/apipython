@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from urllib.parse import quote_plus
 from .config import settings
 
-SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:%s@{settings.database_host_name}/{settings.database_name}'% quote_plus(f'{settings.database_password}')
+SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_host_name}/{settings.database_name}'
 
 # SQLALCHEMY_DATABASE_URL='postgresql://username:password@hostorip/database'
 # print(SQLALCHEMY_DATABASE_URL)
