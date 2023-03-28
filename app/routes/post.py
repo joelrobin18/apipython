@@ -1,7 +1,7 @@
 from fastapi import FastAPI,Body,HTTPException,Response,status,Depends,APIRouter
 from ..database import engine,get_db
 from .. import models,schemas,utils
-from sqlalchemy import desc
+from sqlalchemy import desc,func
 from sqlalchemy.orm import Session
 from random import randrange
 from typing import List
@@ -11,8 +11,10 @@ router=APIRouter(
     tags=['Posts']
 )
 
+# ,response_model=List[schemas.ResponsePost]
+
 ## To make get request to the server. To get the data
-@router.get("/",response_model=List[schemas.ResponsePost])  ## To Validate the response model
+@router.get("/",response_model=List[schemas.PostLike])  ## To Validate the response model
 def root(db:Session=Depends(get_db),curr_user:int = Depends(utils.get_current_user),limit:int=10,search:str="",skip:int =0):
     
     # Using Raw SQL
@@ -20,10 +22,18 @@ def root(db:Session=Depends(get_db),curr_user:int = Depends(utils.get_current_us
     # posts = cursor.fetchall()
     
     # Using SQLALCHEMY or ORM
-    posts =db.query(models.Posts).filter(models.Posts.title.contains(search)).limit(limit).offset(skip).all()
+    # posts =db.query(models.Posts).filter(models.Posts.title.contains(search)).limit(limit).offset(skip).all()
     ## If you want to show only the post which an certain user you can use the follows
-    
     # post=db.query(models.Posts).filter(models.Posts.user_id==curr_user.id).all()
+    
+    # To use join and return the data accordingly
+    # posts = db.query(models.Posts,func.count(models.Votes.user_id).label("Like")).join(
+    #     models.Votes,models.Votes.user_id == models.Posts.user_id,isouter=True).group_by(
+    #         models.Posts.user_id).filter(models.Posts.title.contains(search)).limit(limit).offset(skip).all()
+    
+    posts = db.query(models.Posts, func.count(models.Votes.post_id).label("Likes")).join(
+        models.Votes, models.Votes.post_id == models.Posts.id, isouter=True).group_by(models.Posts.id).filter(models.Posts.title.contains(search)).limit(limit).offset(skip).all()
+    
     return posts
 
 
@@ -53,7 +63,9 @@ def create(post:schemas.PostCreate,db:Session=Depends(get_db),user:int = Depends
 
 
 # Get the latest Post
-@router.get("/latest",response_model=List[schemas.ResponsePost])
+#,response_model=List[schemas.ResponsePost]
+
+@router.get("/latest",response_model=List[schemas.PostLike])
 def latest(db:Session=Depends(get_db),curr_user:int = Depends(utils.get_current_user)):
     
     # Using pure python without db
@@ -66,13 +78,18 @@ def latest(db:Session=Depends(get_db),curr_user:int = Depends(utils.get_current_
     # latest_posts=cursor.fetchall()
     
     # Using SQLALCHEMY or ORM
-    latest_posts=db.query(models.Posts).order_by(desc(models.Posts.created_at)).limit(2).all()
+    # latest_posts=db.query(models.Posts).order_by(desc(models.Posts.created_at)).limit(2).all()
     # print(latest_posts)
-    return latest_posts
+    
+    #To show post detailed along with the number of likes
+    latest_post = db.query(models.Posts,func.count(models.Votes.post_id).label("Likes")).join(
+        models.Votes,models.Votes.post_id == models.Posts.id,isouter=True).group_by(models.Posts.id).order_by(desc(models.Posts.created_at)).limit(3).all()
+    return latest_post
 
 
 # Getting a particular post 
-@router.get("/{id}",response_model=schemas.ResponsePost)
+# ,response_model=schemas.ResponsePost
+@router.get("/{id}",response_model=schemas.PostLike)
 def get_post(id:int,db:Session=Depends(get_db),user: int = Depends(utils.get_current_user)):
     # post= find_post(id) 
     # cursor.execute("""SELECT * from post where id = %s""",(str(id),))
@@ -80,6 +97,11 @@ def get_post(id:int,db:Session=Depends(get_db),user: int = Depends(utils.get_cur
     
     ## Getting a particular post using ORM
     post =db.query(models.Posts).filter(models.Posts.id == id).first()
+    
+    post = db.query(models.Posts, func.count(models.Votes.post_id).label("Likes")).filter(
+        models.Posts.id == id).join(models.Votes,models.Votes.post_id == models.Posts.id).group_by(
+            models.Posts.id).first()
+
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                         detail=f"The post with id : {id} is not found")

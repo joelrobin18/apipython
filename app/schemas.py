@@ -60,3 +60,9 @@ class TokenData(BaseModel):
 class Votes(BaseModel):
     post_id:int
     dir:conint(le=1)    
+
+class PostLike(BaseModel):
+    Posts: ResponsePost
+    Likes: int
+    class Config:
+        orm_mode=True
